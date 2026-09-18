@@ -12,19 +12,19 @@ Every entry is tagged to a person (David or Brian) and is one of three types:
 
 | Type | Counts toward loan position | Counts toward ownership share |
 |---|---|---|
-| **Loan deposit** — money paid into the All In One account | + | + |
-| **Loan withdrawal** — money drawn out of the account | − | − |
-| **Home improvement** — project costs paid outside the loan | — | + |
+| **LOAN - deposit** — money that went directly into the All In One loan | + | + |
+| **LOAN - withdrawal** — money that came directly out of the loan | − | − |
+| **Misc money spent** — money spent on the house outside the loan (e.g. improvement projects) | — | + |
 
 Derived figures:
 
 - **Loan position** (per person) = deposits − withdrawals
-- **Ownership stake** (per person) = loan position + improvements
+- **Ownership stake** (per person) = loan position + misc money spent
 - **Ownership share** = stake ÷ combined stake
 
 ## Views
 
-- **Dashboard** — ownership split, per-person loan positions, improvement
+- **Dashboard** — ownership split, per-person loan positions, misc spending
   totals, and a cumulative-stake chart over time.
 - **Ledger** — the full audit log: every entry with its date, person, type,
   amount, note, and the timestamp it was recorded (plus an "edited" marker),
