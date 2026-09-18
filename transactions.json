@@ -1,0 +1,17 @@
+{
+  "artifact": "https://claude.ai/artifact/LF9PvQpZsRsAGnNaiSo3f1",
+  "syncedAt": "2026-09-18T05:30:00Z",
+  "count": 1,
+  "transactions": [
+    {
+      "id": "uenc75rf1zdjz66onb0s",
+      "date": "2026-09-17",
+      "person": "david",
+      "type": "improvement",
+      "amount": 50000,
+      "note": "earnest money",
+      "createdAt": "2026-09-18T05:11:03.986Z",
+      "updatedAt": "2026-09-18T05:11:03.986Z"
+    }
+  ]
+}

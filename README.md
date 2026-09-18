@@ -38,3 +38,12 @@ ledger; the page renders example data (clearly badged) until the first real
 entry is saved. There is no direct API integration with the loan account —
 CMG's All In One servicing portal has no public API — so the intended workflow
 is a once-a-month manual logging session.
+
+## Data mirror
+
+`transactions.json` is a mirror of the dashboard's shared database, synced to
+this repo by a weekly scheduled task (and on demand). Git history makes it a
+durable, auditable record of the ledger: every change to the data arrives as a
+commit. The dashboard remains the place entries are made — the published page
+runs in a sandbox that cannot call the GitHub API directly, so the mirror is
+one-way (database → repo).
