@@ -1,0 +1,1240 @@
+<title>Kenmore House Ledger</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --paper:#F4F1E8;
+    --paper-deep:#EDE8DA;
+    --paper-card:#F8F5EC;
+    --ink:#1A1916;
+    --ink-soft:#3A382F;
+    --wash:#807A6E;
+    --wash-light:#B5AE9D;
+    --line:#D9D2C0;
+    --seal:#8A1C15;
+    --seal-hover:#7A1811;
+    --david:#9C2A1E;
+    --david-tint:#F0E2DE;
+    --brian:#2F5CAD;
+    --brian-tint:#E0E5F0;
+    --serif:"Noto Serif JP", "Hiragino Mincho ProN", Georgia, serif;
+    --mono:"JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  }
+  body{
+    background:var(--paper);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.32 0 0 0 0 0.24 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23p)'/%3E%3C/svg%3E");
+    color:var(--ink);
+    font-family:var(--serif);
+    font-size:16px;
+    line-height:1.6;
+    margin:0;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding-block:0 4rem;padding-inline:1.5rem;}
+  @media (max-width:520px){ .wrap{padding-inline:1rem;} }
+
+  /* ---------- header ---------- */
+  header.hero{
+    display:grid;
+    grid-template-columns:minmax(260px,5fr) minmax(300px,7fr);
+    gap:1rem 2rem;
+    align-items:end;
+    padding-block:2.5rem 0;
+  }
+  @media (max-width:820px){ header.hero{grid-template-columns:1fr;} }
+  .hero-text h1{
+    font-size:clamp(2rem,4.5vw,3rem);
+    font-weight:700;
+    line-height:1.15;
+    letter-spacing:-0.01em;
+    margin:0 0 .75rem;
+    text-wrap:balance;
+  }
+  .hero-address{
+    font-family:var(--mono);
+    font-size:.8125rem;
+    color:var(--wash);
+    letter-spacing:.06em;
+    margin:0 0 .35rem;
+  }
+  .hero-sub{
+    font-size:.9375rem;
+    color:var(--ink-soft);
+    max-width:44ch;
+    margin:0;
+  }
+  .hero-art{position:relative;min-width:0;}
+  .hero-art svg{display:block;width:100%;height:auto;max-width:100%;}
+  .seal{
+    position:absolute;
+    right:4%;
+    top:6%;
+    background:var(--seal);
+    color:var(--paper);
+    font-family:var(--mono);
+    font-weight:600;
+    font-size:.9rem;
+    letter-spacing:.14em;
+    line-height:1.25;
+    padding:.5rem .55rem;
+    border-radius:2px;
+    transform:rotate(2.5deg);
+    box-shadow:0 1px 0 rgba(26,25,22,.25);
+    text-align:center;
+  }
+  .seal small{display:block;font-size:.55rem;letter-spacing:.3em;opacity:.85;}
+  .brushrule{
+    border:none;height:14px;margin:1.25rem 0 0;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 14' preserveAspectRatio='none'%3E%3Cpath d='M2 8 Q120 3 260 7 T520 6 T780 9 T998 6' fill='none' stroke='%231A1916' stroke-width='3.2' stroke-linecap='round' opacity='.85'/%3E%3Cpath d='M40 11 Q200 8 420 10 T900 10' fill='none' stroke='%231A1916' stroke-width='1' stroke-linecap='round' opacity='.25'/%3E%3C/svg%3E") no-repeat center/100% 100%;
+  }
+
+  /* ---------- tabs & toolbar ---------- */
+  .toolbar{
+    display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;
+    justify-content:space-between;
+    margin:1.5rem 0 1.75rem;
+  }
+  .tabs{display:flex;gap:.25rem;}
+  .tab{
+    font-family:var(--serif);font-size:1rem;font-weight:500;
+    color:var(--wash);
+    background:none;border:none;border-bottom:3px solid transparent;
+    padding:.4rem .9rem .45rem;cursor:pointer;
+  }
+  .tab[aria-selected="true"]{color:var(--ink);font-weight:600;border-bottom-color:var(--seal);}
+  .tab:focus-visible{outline:2px solid var(--seal);outline-offset:2px;border-radius:4px;}
+  .toolbar-actions{display:flex;gap:.6rem;flex-wrap:wrap;}
+  .btn{
+    font-family:var(--serif);font-size:.9375rem;font-weight:600;
+    border-radius:.5rem;padding:.55rem 1.1rem;cursor:pointer;
+    transition:background-color .2s ease, box-shadow .2s ease, transform .1s ease;
+    border:1.5px solid transparent;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn:focus-visible{outline:2px solid var(--seal);outline-offset:2px;}
+  .btn-primary{background:var(--seal);color:var(--paper);}
+  .btn-primary:hover{background:var(--seal-hover);box-shadow:0 2px 8px rgba(138,28,21,.25);}
+  .btn-ghost{background:none;border-color:var(--wash-light);color:var(--ink);}
+  .btn-ghost:hover{background:var(--paper-deep);}
+  .btn[disabled]{opacity:.45;cursor:not-allowed;}
+
+  /* ---------- cards ---------- */
+  .card{
+    background:var(--paper-card);
+    border:1px solid var(--line);
+    border-radius:.5rem;
+    box-shadow:0 2px 12px rgba(26,25,22,.06);
+    padding:1.25rem 1.4rem;
+  }
+  .card h2{
+    font-size:1.05rem;font-weight:600;margin:0 0 .25rem;letter-spacing:.01em;
+  }
+  .card .kicker{
+    font-family:var(--mono);font-size:.6875rem;font-weight:500;
+    text-transform:uppercase;letter-spacing:.18em;color:var(--wash);
+    margin:0 0 .35rem;
+  }
+
+  /* ---------- ownership section ---------- */
+  .own-grid{
+    display:grid;grid-template-columns:7fr 5fr;gap:1.25rem;margin-bottom:1.25rem;
+  }
+  @media (max-width:820px){ .own-grid{grid-template-columns:1fr;} }
+  .share-tiles{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;}
+  @media (max-width:480px){ .share-tiles{grid-template-columns:1fr;} }
+  .share-tile{position:relative;overflow:hidden;}
+  .share-tile::before{
+    content:"";position:absolute;inset:0 auto 0 0;width:5px;
+  }
+  .share-tile.david::before{background:var(--david);}
+  .share-tile.brian::before{background:var(--brian);}
+  .share-pct{
+    font-family:var(--mono);font-weight:600;font-variant-numeric:tabular-nums;
+    font-size:clamp(2.2rem,4.5vw,3rem);line-height:1.05;letter-spacing:-.02em;
+  }
+  .share-name{font-weight:600;font-size:1.05rem;margin-bottom:.1rem;}
+  .share-amt{font-family:var(--mono);font-size:.8125rem;color:var(--wash);font-variant-numeric:tabular-nums;}
+  .splitbar{
+    display:flex;height:18px;border-radius:4px;overflow:hidden;
+    gap:2px;background:var(--paper);
+    margin:1rem 0 .4rem;
+  }
+  .splitbar .seg-d{background:var(--david);}
+  .splitbar .seg-b{background:var(--brian);}
+  .split-note{
+    font-family:var(--mono);font-size:.71875rem;color:var(--wash);
+    letter-spacing:.03em;margin:0;
+  }
+
+  /* ---------- stat rows ---------- */
+  .stat-cols{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem;}
+  @media (max-width:720px){ .stat-cols{grid-template-columns:1fr;} }
+  table.mini{
+    width:100%;border-collapse:collapse;font-size:.875rem;margin-top:.6rem;
+  }
+  table.mini th{
+    text-align:left;font-family:var(--mono);font-weight:500;font-size:.6875rem;
+    text-transform:uppercase;letter-spacing:.14em;color:var(--wash);
+    padding:.3rem .5rem .3rem 0;border-bottom:1px solid var(--line);
+  }
+  table.mini td{
+    padding:.45rem .5rem .45rem 0;border-bottom:1px solid var(--line);
+    font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:.84rem;
+  }
+  table.mini td:first-child{font-family:var(--serif);font-weight:600;font-size:.9rem;}
+  table.mini tr:last-child td{border-bottom:none;}
+  table.mini td.num, table.mini th.num{text-align:right;}
+  table.mini tr.total td{border-top:2px solid var(--ink);border-bottom:none;font-weight:600;}
+  .neg{color:var(--seal);}
+
+  .dot{display:inline-block;width:.6em;height:.6em;border-radius:50%;margin-right:.45em;vertical-align:baseline;}
+  .dot.david{background:var(--david);}
+  .dot.brian{background:var(--brian);}
+
+  /* ---------- chart ---------- */
+  .chart-card{margin-bottom:1.25rem;}
+  .chart-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem;align-items:baseline;}
+  .legend{display:flex;gap:1.1rem;font-size:.8125rem;font-weight:500;}
+  .legend span{white-space:nowrap;}
+  #chart-holder{position:relative;margin-top:.5rem;}
+  #chart-holder svg{display:block;width:100%;height:auto;}
+  #chart-tip{
+    position:absolute;pointer-events:none;display:none;
+    background:var(--ink);color:var(--paper);
+    font-family:var(--mono);font-size:.71875rem;line-height:1.5;
+    padding:.45rem .6rem;border-radius:4px;white-space:nowrap;
+    transform:translate(-50%,-100%);z-index:5;
+  }
+  #chart-tip .t-d{color:#E8B0A8;}
+  #chart-tip .t-b{color:#A9C0EA;}
+  .chart-empty{
+    padding:2.25rem 1rem;text-align:center;color:var(--wash);font-size:.9rem;
+  }
+
+  /* ---------- example ribbon ---------- */
+  .example-note{
+    display:none;
+    background:var(--paper-deep);
+    border:1px dashed var(--wash-light);
+    border-radius:.5rem;
+    padding:.7rem 1rem;
+    margin-bottom:1.25rem;
+    font-size:.875rem;color:var(--ink-soft);
+  }
+  .example-note strong{color:var(--seal);}
+  body.sample-mode .example-note{display:block;}
+  body.sample-mode .sample-badge{
+    display:inline-block;font-family:var(--mono);font-size:.59rem;
+    text-transform:uppercase;letter-spacing:.16em;color:var(--seal);
+    border:1px solid var(--seal);border-radius:3px;padding:0 .3em;
+    margin-left:.5em;vertical-align:middle;
+  }
+  .sample-badge{display:none;}
+
+  /* ---------- status banner ---------- */
+  .banner{
+    display:none;background:var(--paper-deep);border:1px solid var(--line);
+    border-left:4px solid var(--seal);border-radius:.5rem;
+    padding:.7rem 1rem;margin:0 0 1.25rem;font-size:.875rem;
+  }
+  .banner.show{display:block;}
+
+  /* ---------- ledger ---------- */
+  .filters{
+    display:flex;flex-wrap:wrap;gap:.75rem;align-items:end;margin-bottom:1rem;
+  }
+  .field{display:flex;flex-direction:column;gap:.25rem;min-width:0;}
+  .field label{
+    font-family:var(--mono);font-size:.6875rem;font-weight:500;
+    text-transform:uppercase;letter-spacing:.14em;color:var(--wash);
+  }
+  .field select,.field input{
+    font-family:var(--mono);font-size:.875rem;color:var(--ink);
+    background:var(--paper-card);
+    border:1px solid var(--wash-light);border-radius:.4rem;
+    padding:.45rem .6rem;
+  }
+  .field select:focus,.field input:focus{
+    outline:2px solid var(--seal);outline-offset:2px;
+  }
+  .ledger-scroll{overflow-x:auto;}
+  table.ledger{
+    width:100%;border-collapse:collapse;font-size:.875rem;min-width:680px;
+  }
+  table.ledger th{
+    text-align:left;font-family:var(--mono);font-weight:500;font-size:.6875rem;
+    text-transform:uppercase;letter-spacing:.14em;color:var(--wash);
+    padding:.5rem .75rem .5rem 0;border-bottom:2px solid var(--ink);
+    white-space:nowrap;
+  }
+  table.ledger td{
+    padding:.55rem .75rem .55rem 0;border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  table.ledger td.mono{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:.8125rem;white-space:nowrap;}
+  table.ledger th.num, table.ledger td.num{text-align:right;}
+  .who-chip{font-weight:600;white-space:nowrap;}
+  .type-chip{
+    display:inline-flex;align-items:center;gap:.35em;
+    font-family:var(--mono);font-size:.71875rem;letter-spacing:.04em;
+    border:1px solid var(--wash-light);border-radius:999px;
+    padding:.1em .65em;white-space:nowrap;color:var(--ink-soft);
+    background:var(--paper);
+  }
+  .type-chip svg{width:.85em;height:.85em;flex:none;}
+  .rec-meta{font-family:var(--mono);font-size:.6875rem;color:var(--wash);white-space:nowrap;}
+  .row-actions{display:flex;gap:.35rem;white-space:nowrap;}
+  .icon-btn{
+    background:none;border:1px solid transparent;border-radius:.35rem;
+    padding:.2rem .35rem;cursor:pointer;color:var(--wash);
+    font-family:var(--mono);font-size:.71875rem;
+  }
+  .icon-btn:hover{color:var(--ink);background:var(--paper-deep);}
+  .icon-btn.confirm{color:var(--seal);border-color:var(--seal);}
+  .icon-btn:focus-visible{outline:2px solid var(--seal);outline-offset:1px;}
+  .icon-btn svg{width:1em;height:1em;display:block;}
+  .ledger-empty{padding:2.5rem 1rem;text-align:center;color:var(--wash);}
+  .ledger-empty .btn{margin-top:.75rem;}
+
+  /* ---------- entry dialog ---------- */
+  dialog#entry-dialog{
+    border:1px solid var(--line);border-radius:.5rem;
+    background:var(--paper-card);color:var(--ink);
+    box-shadow:0 12px 40px rgba(26,25,22,.25);
+    padding:0;width:min(94vw,460px);
+  }
+  dialog#entry-dialog::backdrop{background:rgba(26,25,22,.45);}
+  .dlg-inner{padding:1.4rem 1.5rem 1.5rem;}
+  .dlg-inner h2{margin:0 0 1rem;font-size:1.2rem;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.9rem 1rem;}
+  .form-grid .full{grid-column:1 / -1;}
+  @media (max-width:420px){ .form-grid{grid-template-columns:1fr;} }
+  .choice-row{display:flex;gap:.4rem;}
+  .choice-row input{position:absolute;opacity:0;pointer-events:none;}
+  .choice-row label.choice{
+    flex:1;text-align:center;cursor:pointer;
+    font-family:var(--serif);font-weight:600;font-size:.9rem;
+    border:1.5px solid var(--wash-light);border-radius:.4rem;
+    padding:.42rem .3rem;color:var(--ink-soft);background:var(--paper-card);
+  }
+  .choice-row input:checked + label.choice{border-color:var(--ink);background:var(--paper-deep);color:var(--ink);}
+  .choice-row input:focus-visible + label.choice{outline:2px solid var(--seal);outline-offset:2px;}
+  .choice-row.person input:checked + label.choice[for="f-person-david"]{border-color:var(--david);color:var(--david);background:var(--david-tint);}
+  .choice-row.person input:checked + label.choice[for="f-person-brian"]{border-color:var(--brian);color:var(--brian);background:var(--brian-tint);}
+  .form-err{display:none;color:var(--seal);font-size:.8125rem;margin:.6rem 0 0;}
+  .form-err.show{display:block;}
+  .type-hint{font-size:.78rem;color:var(--wash);margin:.35rem 0 0;line-height:1.45;}
+  .dlg-actions{display:flex;justify-content:flex-end;gap:.6rem;margin-top:1.2rem;}
+  .amount-wrap{position:relative;}
+  .amount-wrap .cur{
+    position:absolute;left:.6rem;top:50%;transform:translateY(-50%);
+    font-family:var(--mono);font-size:.875rem;color:var(--wash);
+  }
+  .amount-wrap input{width:100%;box-sizing:border-box;padding-left:1.5rem;}
+
+  footer.colophon{
+    margin-top:3rem;font-family:var(--mono);font-size:.71875rem;
+    color:var(--wash);letter-spacing:.04em;line-height:1.8;
+  }
+  footer.colophon .fsep{margin:0 .5em;}
+  .view{display:none;}
+  .view.active{display:block;}
+  @media (prefers-reduced-motion:no-preference){
+    .card, .example-note{animation:rise .42s ease-out both;}
+    @keyframes rise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+  }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="hero-text">
+      <p class="hero-address">18112 60TH AVE NE · KENMORE WA 98028</p>
+      <h1>Kenmore House Ledger</h1>
+      <p class="hero-sub">The joint ledger of David &amp; Brian — every dollar into the
+        CMG All&nbsp;In&nbsp;One loan, every draw out of it, and every improvement to the house,
+        each stroke recorded in turn.</p>
+    </div>
+    <div class="hero-art" aria-label="Ink brush drawing of the house: a low mid-century rambler with two brick chimneys, a picture window, a deck on the left and a carport on the right">
+      <svg viewBox="0 0 960 300" role="img" aria-hidden="true">
+        <defs>
+          <filter id="inkwobble" x="-4%" y="-4%" width="108%" height="108%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.013" numOctaves="2" seed="7" result="n"/>
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="5"/>
+          </filter>
+          <filter id="softwobble" x="-6%" y="-6%" width="112%" height="112%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="11" result="n"/>
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="9"/>
+          </filter>
+        </defs>
+
+        <!-- background tree washes -->
+        <g filter="url(#softwobble)" fill="none" stroke="#807A6E" stroke-linecap="round">
+          <!-- big conifer, right -->
+          <g opacity=".38">
+            <path d="M872 212 L872 38" stroke-width="5" opacity=".5"/>
+            <path d="M872 52 L820 96 M872 52 L926 98" stroke-width="7"/>
+            <path d="M872 86 L806 138 M872 86 L940 140" stroke-width="8"/>
+            <path d="M872 124 L794 182 M872 124 L950 184" stroke-width="9"/>
+            <path d="M872 164 L788 216 M872 164 L954 214" stroke-width="9"/>
+          </g>
+          <!-- deciduous washes, left & center -->
+          <g opacity=".25" stroke="none" fill="#807A6E">
+            <ellipse cx="120" cy="92" rx="86" ry="44"/>
+            <ellipse cx="238" cy="70" rx="70" ry="38"/>
+            <ellipse cx="420" cy="60" rx="96" ry="40"/>
+            <ellipse cx="600" cy="74" rx="78" ry="34"/>
+          </g>
+          <g opacity=".16" stroke="none" fill="#807A6E">
+            <ellipse cx="180" cy="112" rx="120" ry="40"/>
+            <ellipse cx="520" cy="92" rx="120" ry="36"/>
+          </g>
+        </g>
+
+        <!-- house ink drawing -->
+        <g filter="url(#inkwobble)" fill="none" stroke="#1A1916" stroke-linecap="round" stroke-linejoin="round">
+          <!-- left wing roof + fascia -->
+          <path d="M74 150 L348 143" stroke-width="5"/>
+          <path d="M80 158 L344 151" stroke-width="1.4" opacity=".5"/>
+          <!-- left wing body -->
+          <path d="M92 152 L92 258 M336 146 L336 256" stroke-width="2.4"/>
+          <!-- horizontal siding hints -->
+          <path d="M96 176 L332 172 M96 200 L332 196 M96 224 L332 220 M96 246 L332 243" stroke-width=".9" opacity=".38"/>
+          <!-- sliding glass doors -->
+          <g stroke-width="2">
+            <rect x="112" y="168" width="52" height="88" />
+            <rect x="172" y="167" width="52" height="88" />
+            <rect x="248" y="166" width="56" height="88" />
+            <path d="M138 168 L138 256 M198 167 L198 255 M276 166 L276 254" stroke-width="1.2" opacity=".6"/>
+          </g>
+          <!-- deck + posts -->
+          <path d="M58 260 L346 257" stroke-width="3.4"/>
+          <path d="M66 260 L66 276 M150 259 L150 277 M240 258 L240 277 M330 257 L330 276" stroke-width="2"/>
+          <path d="M58 268 L346 265" stroke-width="1.2" opacity=".5"/>
+
+          <!-- center section roof (slightly higher) -->
+          <path d="M336 146 L370 132 L664 128" stroke-width="5"/>
+          <path d="M376 140 L658 136" stroke-width="1.4" opacity=".5"/>
+          <!-- center body -->
+          <path d="M664 130 L664 258" stroke-width="2.4"/>
+          <!-- vertical board-and-batten siding -->
+          <path d="M382 148 L382 258 M398 147 L398 258 M414 147 L414 258 M430 146 L430 258 M446 146 L446 258" stroke-width="1" opacity=".42"/>
+          <!-- garden hose on wall -->
+          <circle cx="432" cy="212" r="13" stroke-width="2.2"/>
+          <circle cx="432" cy="212" r="7" stroke-width="1.2" opacity=".6"/>
+          <!-- picture window -->
+          <rect x="470" y="164" width="176" height="82" stroke-width="3"/>
+          <path d="M558 164 L558 246" stroke-width="1.6" opacity=".7"/>
+          <path d="M478 172 L510 200" stroke-width="1" opacity=".3"/>
+          <!-- planter under window -->
+          <rect x="548" y="252" width="26" height="18" stroke-width="1.8"/>
+
+          <!-- chimney small (left of center) -->
+          <rect x="358" y="96" width="22" height="38" stroke-width="2.6"/>
+          <path d="M356 96 L384 95" stroke-width="3.4"/>
+          <path d="M362 106 L376 106 M362 116 L376 115 M362 126 L376 125" stroke-width=".9" opacity=".5"/>
+          <!-- chimney large (center) -->
+          <rect x="548" y="66" width="42" height="64" stroke-width="3"/>
+          <path d="M543 66 L595 64" stroke-width="4.4"/>
+          <path d="M554 80 L584 79 M554 94 L584 93 M554 108 L584 107 M569 72 L569 124" stroke-width="1" opacity=".5"/>
+
+          <!-- carport roof, right -->
+          <path d="M664 132 L906 146" stroke-width="4.6"/>
+          <path d="M670 141 L898 154" stroke-width="1.4" opacity=".5"/>
+          <path d="M898 150 L898 262" stroke-width="2.6"/>
+          <!-- door under carport -->
+          <rect x="678" y="168" width="40" height="88" stroke-width="2.2"/>
+          <circle cx="712" cy="214" r="2" stroke-width="1.6"/>
+          <!-- fence / gate -->
+          <path d="M742 200 L742 262 M760 200 L760 262 M778 200 L778 262 M796 201 L796 262 M814 201 L814 262 M832 202 L832 262 M850 202 L850 263 M868 203 L868 263" stroke-width="2.4" opacity=".8"/>
+          <path d="M736 202 L874 205 M736 236 L874 238" stroke-width="1.6"/>
+
+          <!-- ground stroke -->
+          <path d="M36 272 Q300 264 560 270 T936 272" stroke-width="4.2"/>
+          <path d="M130 284 L210 283 M420 288 L530 287 M640 284 L700 283" stroke-width="1.2" opacity=".35"/>
+          <!-- driveway -->
+          <path d="M726 262 Q790 276 850 296 M898 262 Q916 276 936 294" stroke-width="1.8" opacity=".6"/>
+        </g>
+
+        <!-- shrub washes, foreground -->
+        <g filter="url(#softwobble)" fill="#807A6E" stroke="none">
+          <g opacity=".34">
+            <ellipse cx="362" cy="248" rx="34" ry="24"/>
+            <ellipse cx="470" cy="250" rx="42" ry="27"/>
+            <ellipse cx="512" cy="256" rx="26" ry="17"/>
+            <ellipse cx="700" cy="256" rx="34" ry="20"/>
+          </g>
+          <g opacity=".2">
+            <ellipse cx="120" cy="262" rx="20" ry="10"/>
+            <ellipse cx="170" cy="264" rx="16" ry="8"/>
+            <ellipse cx="226" cy="263" rx="18" ry="9"/>
+            <ellipse cx="654" cy="262" rx="18" ry="10"/>
+            <ellipse cx="806" cy="290" rx="40" ry="9"/>
+          </g>
+        </g>
+        <g filter="url(#inkwobble)" fill="none" stroke="#1A1916" stroke-linecap="round" opacity=".55">
+          <path d="M338 244 Q362 222 388 246" stroke-width="1.6"/>
+          <path d="M436 246 Q470 216 506 248" stroke-width="1.6"/>
+          <path d="M672 252 Q700 232 728 254" stroke-width="1.4"/>
+        </g>
+      </svg>
+      <div class="seal" aria-label="Seal with house number 18112"><small>KENMORE</small>18112</div>
+    </div>
+  </header>
+  <hr class="brushrule" aria-hidden="true">
+
+  <div class="toolbar">
+    <div class="tabs" role="tablist" aria-label="Views">
+      <button class="tab" id="tab-dash" role="tab" aria-selected="true" aria-controls="view-dash">Dashboard</button>
+      <button class="tab" id="tab-ledger" role="tab" aria-selected="false" aria-controls="view-ledger">Ledger</button>
+    </div>
+    <div class="toolbar-actions">
+      <button class="btn btn-ghost" id="btn-export" hidden>Export CSV</button>
+      <button class="btn btn-primary" id="btn-add">Log an entry</button>
+    </div>
+  </div>
+
+  <div class="banner" id="db-banner"></div>
+
+  <div class="example-note">
+    <strong>Example data.</strong> These are sample figures so you can see how the ledger reads —
+    nothing has been saved. Log your first real entry and they disappear.
+  </div>
+
+  <!-- ================= DASHBOARD ================= -->
+  <section class="view active" id="view-dash" role="tabpanel" aria-labelledby="tab-dash">
+
+    <div class="own-grid">
+      <div class="card">
+        <p class="kicker">Ownership</p>
+        <h2>Who owns what<span class="sample-badge">example</span></h2>
+        <div class="splitbar" id="splitbar" aria-hidden="true">
+          <div class="seg-d" style="width:50%"></div>
+          <div class="seg-b" style="width:50%"></div>
+        </div>
+        <p class="split-note">share = (loan deposits − withdrawals + improvements) ÷ combined total</p>
+        <table class="mini" id="own-table">
+          <thead><tr><th>Person</th><th class="num">Loan, net</th><th class="num">Improvements</th><th class="num">Total in</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="share-tiles">
+        <div class="card share-tile david">
+          <p class="share-name"><span class="dot david" aria-hidden="true"></span>David</p>
+          <div class="share-pct" id="pct-david">—</div>
+          <div class="share-amt" id="amt-david"></div>
+        </div>
+        <div class="card share-tile brian">
+          <p class="share-name"><span class="dot brian" aria-hidden="true"></span>Brian</p>
+          <div class="share-pct" id="pct-brian">—</div>
+          <div class="share-amt" id="amt-brian"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-cols">
+      <div class="card">
+        <p class="kicker">CMG All In One account</p>
+        <h2>Loan positions<span class="sample-badge">example</span></h2>
+        <table class="mini" id="loan-table">
+          <thead><tr><th>Person</th><th class="num">Deposits</th><th class="num">Withdrawals</th><th class="num">Net</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <p class="kicker">Outside the loan</p>
+        <h2>Home improvements<span class="sample-badge">example</span></h2>
+        <table class="mini" id="imp-table">
+          <thead><tr><th>Person</th><th class="num">Projects</th><th class="num">Spent</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card chart-card">
+      <div class="chart-head">
+        <div>
+          <p class="kicker">Over time</p>
+          <h2>Cumulative stake<span class="sample-badge">example</span></h2>
+        </div>
+        <div class="legend" aria-hidden="true">
+          <span><span class="dot david"></span>David</span>
+          <span><span class="dot brian"></span>Brian</span>
+        </div>
+      </div>
+      <div id="chart-holder">
+        <div id="chart-tip"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LEDGER ================= -->
+  <section class="view" id="view-ledger" role="tabpanel" aria-labelledby="tab-ledger">
+    <div class="card">
+      <p class="kicker">Audit log</p>
+      <h2>Every entry, oldest to newest<span class="sample-badge">example</span></h2>
+      <div class="filters">
+        <div class="field">
+          <label for="flt-person">Person</label>
+          <select id="flt-person">
+            <option value="">Both</option>
+            <option value="david">David</option>
+            <option value="brian">Brian</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="flt-type">Type</label>
+          <select id="flt-type">
+            <option value="">All types</option>
+            <option value="deposit">Loan deposit</option>
+            <option value="withdrawal">Loan withdrawal</option>
+            <option value="improvement">Improvement</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="flt-year">Year</label>
+          <select id="flt-year"><option value="">All</option></select>
+        </div>
+      </div>
+      <div class="ledger-scroll">
+        <table class="ledger" id="ledger-table">
+          <thead>
+            <tr>
+              <th>Date</th><th>Who</th><th>Type</th>
+              <th class="num">Amount</th><th>Note</th><th>Recorded</th><th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="ledger-empty" id="ledger-empty" hidden>
+        <p>No entries match. The brush awaits its first stroke.</p>
+        <button class="btn btn-primary" id="btn-add-2">Log an entry</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="colophon">
+    <span id="foot-count">0 entries</span><span class="fsep">·</span>
+    CMG Financial — All In One loan<span class="fsep">·</span>
+    amounts in USD<span class="fsep">·</span>
+    shared ledger — entries save for both of you
+  </footer>
+</div>
+
+<!-- ================= ENTRY DIALOG ================= -->
+<dialog id="entry-dialog">
+  <form class="dlg-inner" id="entry-form" method="dialog" novalidate>
+    <h2 id="dlg-title">Log an entry</h2>
+    <div class="form-grid">
+      <div class="field full">
+        <label>Who is this for?</label>
+        <div class="choice-row person">
+          <input type="radio" name="person" value="david" id="f-person-david" checked>
+          <label class="choice" for="f-person-david">David</label>
+          <input type="radio" name="person" value="brian" id="f-person-brian">
+          <label class="choice" for="f-person-brian">Brian</label>
+        </div>
+      </div>
+      <div class="field full">
+        <label>Type</label>
+        <div class="choice-row">
+          <input type="radio" name="ttype" value="deposit" id="f-type-deposit" checked>
+          <label class="choice" for="f-type-deposit">Loan deposit</label>
+          <input type="radio" name="ttype" value="withdrawal" id="f-type-withdrawal">
+          <label class="choice" for="f-type-withdrawal">Withdrawal</label>
+          <input type="radio" name="ttype" value="improvement" id="f-type-improvement">
+          <label class="choice" for="f-type-improvement">Improvement</label>
+        </div>
+        <p class="type-hint" id="type-hint">Money paid into the All In One account. Counts toward your loan position and your ownership share.</p>
+      </div>
+      <div class="field">
+        <label for="f-date">Date</label>
+        <input type="date" id="f-date" required>
+      </div>
+      <div class="field">
+        <label for="f-amount">Amount</label>
+        <div class="amount-wrap">
+          <span class="cur" aria-hidden="true">$</span>
+          <input type="number" id="f-amount" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00" required>
+        </div>
+      </div>
+      <div class="field full">
+        <label for="f-note">Note <span style="text-transform:none;letter-spacing:0;">(optional)</span></label>
+        <input type="text" id="f-note" maxlength="200" placeholder="e.g. September payment, deck re-stain…">
+      </div>
+    </div>
+    <p class="form-err" id="form-err"></p>
+    <div class="dlg-actions">
+      <button type="button" class="btn btn-ghost" id="btn-cancel">Cancel</button>
+      <button type="submit" class="btn btn-primary" id="btn-save">Save entry</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- constants ---------- */
+  var PEOPLE = { david:"David", brian:"Brian" };
+  var TYPES = {
+    deposit:     { label:"Loan deposit",   sign:+1, loan:+1 },
+    withdrawal:  { label:"Withdrawal",     sign:-1, loan:-1 },
+    improvement: { label:"Improvement",    sign:+1, loan: 0 }
+  };
+  var TYPE_HINTS = {
+    deposit:     "Money paid into the All In One account. Counts toward your loan position and your ownership share.",
+    withdrawal:  "Money drawn out of the All In One account. Reduces your loan position and your ownership share.",
+    improvement: "A home-improvement cost paid outside the loan account. Counts toward your ownership share only."
+  };
+  var SAMPLE = [
+    {id:"s1", date:"2026-06-01", person:"david", type:"deposit",     amount:60000, note:"Down payment at closing", createdAt:"2026-06-01T18:00:00Z"},
+    {id:"s2", date:"2026-06-01", person:"brian", type:"deposit",     amount:45000, note:"Down payment at closing", createdAt:"2026-06-01T18:01:00Z"},
+    {id:"s3", date:"2026-07-01", person:"david", type:"deposit",     amount:3800,  note:"July paycheck sweep",     createdAt:"2026-07-01T16:00:00Z"},
+    {id:"s4", date:"2026-07-05", person:"brian", type:"deposit",     amount:2900,  note:"July deposit",            createdAt:"2026-07-05T16:00:00Z"},
+    {id:"s5", date:"2026-07-22", person:"brian", type:"improvement", amount:1450,  note:"Exterior trim paint",     createdAt:"2026-07-22T20:00:00Z"},
+    {id:"s6", date:"2026-08-01", person:"david", type:"deposit",     amount:3800,  note:"August paycheck sweep",   createdAt:"2026-08-01T16:00:00Z"},
+    {id:"s7", date:"2026-08-03", person:"brian", type:"deposit",     amount:2900,  note:"August deposit",          createdAt:"2026-08-03T16:00:00Z"},
+    {id:"s8", date:"2026-08-14", person:"david", type:"withdrawal",  amount:1200,  note:"Car repair draw",         createdAt:"2026-08-14T19:00:00Z"},
+    {id:"s9", date:"2026-09-01", person:"david", type:"deposit",     amount:3800,  note:"September paycheck sweep",createdAt:"2026-09-01T16:00:00Z"},
+    {id:"s10",date:"2026-09-01", person:"brian", type:"deposit",     amount:2900,  note:"September deposit",       createdAt:"2026-09-01T16:05:00Z"},
+    {id:"s11",date:"2026-09-06", person:"david", type:"improvement", amount:2600,  note:"Heat pump service + ducting", createdAt:"2026-09-06T21:00:00Z"}
+  ];
+
+  /* ---------- state ---------- */
+  var db = null, dl = null;
+  var dbState = "pending";      // pending | ok | none
+  var txs = [];                 // real rows from the store
+  var usingSample = false;
+  var editingId = null;
+  var writeLocked = false;      // set when a well-formed write is refused
+  var pendingLocal = {};        // optimistic adds before snapshot echo
+
+  var $ = function(id){ return document.getElementById(id); };
+  var fmt0 = new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0});
+  var fmt2 = new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",minimumFractionDigits:2,maximumFractionDigits:2});
+
+  function esc(s){
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+  function rows(){ return usingSample ? SAMPLE : txs; }
+  function sortRows(list){
+    return list.slice().sort(function(a,b){
+      if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+      var ca = a.createdAt || "", cb = b.createdAt || "";
+      if (ca !== cb) return ca < cb ? -1 : 1;
+      return a.id < b.id ? -1 : 1;
+    });
+  }
+
+  /* ---------- aggregation ---------- */
+  function aggregate(list){
+    var agg = {
+      david:{dep:0,wd:0,imp:0,impCount:0},
+      brian:{dep:0,wd:0,imp:0,impCount:0}
+    };
+    list.forEach(function(t){
+      var p = agg[t.person]; if (!p) return;
+      var amt = Number(t.amount) || 0;
+      if (t.type === "deposit") p.dep += amt;
+      else if (t.type === "withdrawal") p.wd += amt;
+      else if (t.type === "improvement"){ p.imp += amt; p.impCount += 1; }
+    });
+    ["david","brian"].forEach(function(k){
+      agg[k].net = agg[k].dep - agg[k].wd;
+      agg[k].own = agg[k].net + agg[k].imp;
+    });
+    agg.totalOwn = agg.david.own + agg.brian.own;
+    return agg;
+  }
+
+  /* ---------- dashboard render ---------- */
+  function money(v, precise){
+    var f = (precise ? fmt2 : fmt0).format(Math.abs(v));
+    return v < 0 ? "−" + f : f;
+  }
+  function moneyCell(v, precise){
+    return '<td class="num' + (v < 0 ? ' neg' : '') + '">' + money(v, precise) + "</td>";
+  }
+
+  function renderDashboard(){
+    var list = rows();
+    var a = aggregate(list);
+    var dPct = null, bPct = null;
+    if (a.totalOwn > 0){
+      dPct = Math.max(0, a.david.own) / a.totalOwn * 100;
+      bPct = Math.max(0, a.brian.own) / a.totalOwn * 100;
+      var s = dPct + bPct; if (s > 0){ dPct = dPct / s * 100; bPct = 100 - dPct; }
+    }
+    $("pct-david").textContent = dPct == null ? "—" : dPct.toFixed(1) + "%";
+    $("pct-brian").textContent = bPct == null ? "—" : bPct.toFixed(1) + "%";
+    $("amt-david").textContent = money(a.david.own) + " total stake";
+    $("amt-brian").textContent = money(a.brian.own) + " total stake";
+
+    var bar = $("splitbar");
+    if (dPct == null){
+      bar.firstElementChild.style.width = "50%";
+      bar.lastElementChild.style.width = "50%";
+      bar.style.opacity = ".25";
+    } else {
+      bar.style.opacity = "1";
+      bar.firstElementChild.style.width = dPct.toFixed(2) + "%";
+      bar.lastElementChild.style.width = bPct.toFixed(2) + "%";
+    }
+
+    $("own-table").querySelector("tbody").innerHTML =
+      ["david","brian"].map(function(k){
+        return "<tr><td><span class='dot " + k + "'></span>" + PEOPLE[k] + "</td>" +
+          moneyCell(a[k].net) + moneyCell(a[k].imp) + moneyCell(a[k].own) + "</tr>";
+      }).join("") +
+      "<tr class='total'><td>Together</td>" + moneyCell(a.david.net + a.brian.net) +
+      moneyCell(a.david.imp + a.brian.imp) + moneyCell(a.totalOwn) + "</tr>";
+
+    $("loan-table").querySelector("tbody").innerHTML =
+      ["david","brian"].map(function(k){
+        return "<tr><td><span class='dot " + k + "'></span>" + PEOPLE[k] + "</td>" +
+          moneyCell(a[k].dep) + moneyCell(-a[k].wd) + moneyCell(a[k].net) + "</tr>";
+      }).join("") +
+      "<tr class='total'><td>Together</td>" + moneyCell(a.david.dep + a.brian.dep) +
+      moneyCell(-(a.david.wd + a.brian.wd)) + moneyCell(a.david.net + a.brian.net) + "</tr>";
+
+    $("imp-table").querySelector("tbody").innerHTML =
+      ["david","brian"].map(function(k){
+        return "<tr><td><span class='dot " + k + "'></span>" + PEOPLE[k] + "</td>" +
+          "<td class='num'>" + a[k].impCount + "</td>" + moneyCell(a[k].imp) + "</tr>";
+      }).join("") +
+      "<tr class='total'><td>Together</td><td class='num'>" +
+      (a.david.impCount + a.brian.impCount) + "</td>" +
+      moneyCell(a.david.imp + a.brian.imp) + "</tr>";
+
+    $("foot-count").textContent = (usingSample ? "0 entries (showing example)" :
+      txs.length + (txs.length === 1 ? " entry" : " entries"));
+
+    renderChart(sortRows(list));
+  }
+
+  /* ---------- chart ---------- */
+  var chartMeta = null;
+  function renderChart(sorted){
+    var holder = $("chart-holder");
+    var tip = $("chart-tip");
+    holder.querySelectorAll("svg,.chart-empty").forEach(function(n){ n.remove(); });
+    chartMeta = null;
+
+    if (!sorted.length){
+      var d = document.createElement("div");
+      d.className = "chart-empty";
+      d.textContent = "The chart draws itself as entries arrive.";
+      holder.appendChild(d);
+      return;
+    }
+
+    // cumulative stake per person at each entry
+    var pts = [], cd = 0, cb = 0;
+    sorted.forEach(function(t){
+      var amt = (Number(t.amount) || 0) * TYPES[t.type].sign;
+      if (t.person === "david") cd += amt; else cb += amt;
+      pts.push({ date:t.date, d:cd, b:cb });
+    });
+    // collapse to one point per date (last of day)
+    var byDate = [];
+    pts.forEach(function(p){
+      if (byDate.length && byDate[byDate.length-1].date === p.date) byDate[byDate.length-1] = p;
+      else byDate.push(p);
+    });
+
+    var W = 900, H = 300, mL = 64, mR = 76, mT = 16, mB = 34;
+    var iw = W - mL - mR, ih = H - mT - mB;
+    var t0 = new Date(byDate[0].date + "T00:00:00").getTime();
+    var t1 = new Date(byDate[byDate.length-1].date + "T00:00:00").getTime();
+    if (t1 === t0) t1 = t0 + 86400000;
+    var maxY = 0, minY = 0;
+    byDate.forEach(function(p){ maxY = Math.max(maxY, p.d, p.b); minY = Math.min(minY, p.d, p.b); });
+    if (maxY <= 0) maxY = 1;
+    // nice ticks
+    var span = maxY - Math.min(0, minY);
+    var step = Math.pow(10, Math.floor(Math.log10(span)));
+    if (span / step < 2) step /= 5; else if (span / step < 5) step /= 2;
+    var yMin = Math.min(0, Math.floor(minY / step) * step);
+    var yMax = Math.ceil(maxY / step) * step;
+    var X = function(dt){ return mL + (new Date(dt + "T00:00:00").getTime() - t0) / (t1 - t0) * iw; };
+    var Y = function(v){ return mT + ih - (v - yMin) / (yMax - yMin) * ih; };
+
+    function stepPath(key){
+      var p = "M" + X(byDate[0].date).toFixed(1) + " " + Y(0).toFixed(1);
+      var prev = 0;
+      byDate.forEach(function(pt){
+        var x = X(pt.date).toFixed(1);
+        p += " L" + x + " " + Y(prev).toFixed(1) + " L" + x + " " + Y(pt[key]).toFixed(1);
+        prev = pt[key];
+      });
+      return p;
+    }
+    var sh = function(v){
+      return Math.abs(v) >= 1000 ? "$" + (v/1000).toFixed(v % 1000 === 0 ? 0 : 1) + "k" : "$" + Math.round(v);
+    };
+
+    var g = "";
+    // gridlines + y labels
+    for (var v = yMin; v <= yMax + step/2; v += step){
+      var y = Y(v).toFixed(1);
+      g += "<line x1='" + mL + "' x2='" + (W-mR) + "' y1='" + y + "' y2='" + y +
+           "' stroke='#D9D2C0' stroke-width='" + (v===0 ? 1.5 : 1) + "'/>";
+      g += "<text x='" + (mL-8) + "' y='" + y + "' text-anchor='end' dominant-baseline='middle' " +
+           "font-size='11' fill='#807A6E' font-family='JetBrains Mono, monospace'>" + sh(v) + "</text>";
+    }
+    // x ticks: up to 6, month labels
+    var months = {};
+    byDate.forEach(function(p){ months[p.date.slice(0,7)] = true; });
+    var mkeys = Object.keys(months).sort();
+    var every = Math.max(1, Math.ceil(mkeys.length / 6));
+    mkeys.forEach(function(mk, i){
+      if (i % every) return;
+      var dt = mk + "-01";
+      var x = Math.max(mL, X(dt));
+      if (x > W - mR) return;
+      var mon = new Date(dt + "T00:00:00").toLocaleDateString("en-US",{month:"short"});
+      var lbl = (mk.slice(5) === "01" || i === 0) ? mon + " ’" + mk.slice(2,4) : mon;
+      g += "<text x='" + x.toFixed(1) + "' y='" + (H-10) + "' text-anchor='middle' font-size='11' " +
+           "fill='#807A6E' font-family='JetBrains Mono, monospace'>" + esc(lbl) + "</text>";
+    });
+    // series
+    var last = byDate[byDate.length-1];
+    [["d","#9C2A1E","David"],["b","#2F5CAD","Brian"]].forEach(function(s){
+      g += "<path d='" + stepPath(s[0]) + "' fill='none' stroke='" + s[1] + "' stroke-width='2' stroke-linejoin='round'/>";
+      var ex = X(last.date), ey = Y(last[s[0]]);
+      g += "<circle cx='" + ex.toFixed(1) + "' cy='" + ey.toFixed(1) + "' r='4' fill='" + s[1] + "' stroke='#F8F5EC' stroke-width='2'/>";
+      g += "<text x='" + (ex+9).toFixed(1) + "' y='" + ey.toFixed(1) + "' dominant-baseline='middle' font-size='12' " +
+           "font-weight='600' fill='#1A1916' font-family='Noto Serif JP, serif'>" + s[2] + "</text>";
+    });
+    // hover crosshair placeholder
+    g += "<line id='xhair' x1='0' x2='0' y1='" + mT + "' y2='" + (mT+ih) + "' stroke='#807A6E' stroke-width='1' stroke-dasharray='3 3' visibility='hidden'/>";
+
+    var svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+    svg.setAttribute("viewBox","0 0 " + W + " " + H);
+    svg.setAttribute("role","img");
+    svg.setAttribute("aria-label","Cumulative stake over time for David and Brian");
+    svg.innerHTML = g;
+    holder.insertBefore(svg, tip);
+    chartMeta = { byDate:byDate, X:X, Y:Y, W:W, H:H, mL:mL, mR:mR, svg:svg };
+
+    svg.addEventListener("pointermove", chartHover);
+    svg.addEventListener("pointerleave", function(){
+      tip.style.display = "none";
+      var xh = svg.querySelector("#xhair"); if (xh) xh.setAttribute("visibility","hidden");
+    });
+  }
+
+  function chartHover(ev){
+    if (!chartMeta) return;
+    var m = chartMeta, tip = $("chart-tip");
+    var r = m.svg.getBoundingClientRect();
+    var px = (ev.clientX - r.left) / r.width * m.W;
+    if (px < m.mL || px > m.W - m.mR) return;
+    var best = null, bd = 1e18;
+    m.byDate.forEach(function(p){
+      var d = Math.abs(m.X(p.date) - px);
+      if (d < bd){ bd = d; best = p; }
+    });
+    if (!best) return;
+    var bx = m.X(best.date);
+    var xh = m.svg.querySelector("#xhair");
+    xh.setAttribute("x1", bx); xh.setAttribute("x2", bx);
+    xh.setAttribute("visibility","visible");
+    var dt = new Date(best.date + "T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+    tip.innerHTML = esc(dt) +
+      "<br><span class='t-d'>David&nbsp;&nbsp;" + esc(fmt0.format(best.d)) + "</span>" +
+      "<br><span class='t-b'>Brian&nbsp;&nbsp;" + esc(fmt0.format(best.b)) + "</span>";
+    tip.style.display = "block";
+    var hr = $("chart-holder").getBoundingClientRect();
+    var lx = bx / m.W * r.width + (r.left - hr.left);
+    tip.style.left = Math.max(70, Math.min(hr.width - 70, lx)) + "px";
+    tip.style.top = Math.max(52, ev.clientY - hr.top - 14) + "px";
+  }
+
+  /* ---------- ledger render ---------- */
+  var ICONS = {
+    deposit: "<svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round'><path d='M8 2v8m0 0 3-3m-3 3L5 7M3 13h10'/></svg>",
+    withdrawal: "<svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round'><path d='M8 14V6m0 0 3 3m-3-3L5 9M3 3h10'/></svg>",
+    improvement: "<svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M9.5 4.5 12 2l2 2-2.5 2.5M9.5 4.5 2 12v2h2l7.5-7.5M9.5 4.5 11.5 6.5'/></svg>"
+  };
+  function recStamp(t){
+    if (!t.createdAt) return "";
+    var d = new Date(t.createdAt);
+    if (isNaN(d)) return "";
+    var s = d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"2-digit"}) +
+            " " + d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
+    if (t.updatedAt && t.updatedAt !== t.createdAt) s += " · edited";
+    return s;
+  }
+
+  function renderLedger(){
+    var fp = $("flt-person").value, ft = $("flt-type").value, fy = $("flt-year").value;
+    var list = sortRows(rows()).filter(function(t){
+      if (fp && t.person !== fp) return false;
+      if (ft && t.type !== ft) return false;
+      if (fy && t.date.slice(0,4) !== fy) return false;
+      return true;
+    });
+
+    // year filter options
+    var years = {};
+    rows().forEach(function(t){ years[t.date.slice(0,4)] = true; });
+    var ysel = $("flt-year");
+    var have = Array.prototype.map.call(ysel.options, function(o){ return o.value; });
+    Object.keys(years).sort().forEach(function(y){
+      if (have.indexOf(y) === -1){
+        var o = document.createElement("option"); o.value = y; o.textContent = y; ysel.appendChild(o);
+      }
+    });
+
+    var tb = $("ledger-table").querySelector("tbody");
+    $("ledger-empty").hidden = list.length > 0;
+    $("ledger-table").hidden = list.length === 0;
+
+    tb.innerHTML = list.map(function(t){
+      var ty = TYPES[t.type] || TYPES.deposit;
+      var signed = (Number(t.amount) || 0) * ty.sign;
+      var canAct = !usingSample && !writeLocked && dbState === "ok";
+      return "<tr data-id='" + esc(t.id) + "'>" +
+        "<td class='mono'>" + esc(t.date) + "</td>" +
+        "<td><span class='who-chip'><span class='dot " + esc(t.person) + "'></span>" + esc(PEOPLE[t.person] || t.person) + "</span></td>" +
+        "<td><span class='type-chip'>" + ICONS[t.type] + esc(ty.label) + "</span></td>" +
+        "<td class='mono num" + (signed < 0 ? " neg" : "") + "'>" + money(signed, true) + "</td>" +
+        "<td>" + esc(t.note || "") + "</td>" +
+        "<td><span class='rec-meta'>" + esc(recStamp(t)) + "</span></td>" +
+        "<td>" + (canAct ?
+          "<span class='row-actions'>" +
+          "<button class='icon-btn' data-act='edit' aria-label='Edit entry'>edit</button>" +
+          "<button class='icon-btn' data-act='del' aria-label='Delete entry'>delete</button></span>" : "") +
+        "</td></tr>";
+    }).join("");
+  }
+
+  function renderAll(){
+    usingSample = (dbState !== "pending") && txs.length === 0;
+    document.body.classList.toggle("sample-mode", usingSample);
+    renderDashboard();
+    renderLedger();
+  }
+
+  /* ---------- tabs ---------- */
+  function selectTab(which){
+    var dash = which === "dash";
+    $("tab-dash").setAttribute("aria-selected", dash);
+    $("tab-ledger").setAttribute("aria-selected", !dash);
+    $("view-dash").classList.toggle("active", dash);
+    $("view-ledger").classList.toggle("active", !dash);
+    try { localStorage.setItem("khl-tab", which); } catch(e){}
+  }
+  $("tab-dash").addEventListener("click", function(){ selectTab("dash"); });
+  $("tab-ledger").addEventListener("click", function(){ selectTab("ledger"); });
+  try { if (localStorage.getItem("khl-tab") === "ledger") selectTab("ledger"); } catch(e){}
+
+  /* ---------- entry dialog ---------- */
+  var dlg = $("entry-dialog");
+  function todayStr(){
+    var d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+  }
+  function openDialog(edit){
+    editingId = edit ? edit.id : null;
+    $("dlg-title").textContent = edit ? "Edit entry" : "Log an entry";
+    $("btn-save").textContent = edit ? "Update entry" : "Save entry";
+    $("form-err").classList.remove("show");
+    var person = edit ? edit.person : "david";
+    var ttype = edit ? edit.type : "deposit";
+    $("f-person-" + person).checked = true;
+    $("f-type-" + ttype).checked = true;
+    $("type-hint").textContent = TYPE_HINTS[ttype];
+    $("f-date").value = edit ? edit.date : todayStr();
+    $("f-amount").value = edit ? edit.amount : "";
+    $("f-note").value = edit ? (edit.note || "") : "";
+    dlg.showModal();
+    $("f-amount").focus();
+  }
+  $("btn-add").addEventListener("click", function(){ openDialog(null); });
+  $("btn-add-2").addEventListener("click", function(){ openDialog(null); });
+  $("btn-cancel").addEventListener("click", function(){ dlg.close(); });
+  Array.prototype.forEach.call(document.querySelectorAll("input[name=ttype]"), function(r){
+    r.addEventListener("change", function(){ $("type-hint").textContent = TYPE_HINTS[r.value]; });
+  });
+
+  function formError(msg){
+    var el = $("form-err");
+    el.textContent = msg;
+    el.classList.add("show");
+  }
+
+  $("entry-form").addEventListener("submit", function(ev){
+    ev.preventDefault();
+    var person = document.querySelector("input[name=person]:checked").value;
+    var ttype = document.querySelector("input[name=ttype]:checked").value;
+    var date = $("f-date").value;
+    var amount = parseFloat($("f-amount").value);
+    var note = $("f-note").value.trim();
+    if (!date) return formError("Pick a date for the entry.");
+    if (!(amount > 0)) return formError("Enter an amount greater than zero.");
+    amount = Math.round(amount * 100) / 100;
+
+    if (dbState !== "ok"){
+      return formError("The shared ledger isn't reachable from this view, so this entry can't be saved.");
+    }
+    if (writeLocked){
+      return formError("This view is read-only — your access level here doesn't allow saving entries.");
+    }
+
+    var now = new Date().toISOString();
+    var saveBtn = $("btn-save");
+    saveBtn.disabled = true;
+
+    var done = function(){ saveBtn.disabled = false; dlg.close(); };
+    var fail = function(e){
+      saveBtn.disabled = false;
+      if (e && e.code === "invalid_argument"){
+        writeLocked = true;
+        formError("The ledger refused the write — this view appears to be read-only. Ask David to share the page with edit access.");
+        renderAll();
+      } else if (e && e.code === "quota_exceeded"){
+        formError("The ledger's document limit is full. Delete old entries to make room.");
+      } else {
+        formError("Couldn't save (" + (e && e.code ? e.code : "unknown") + "). Try once more in a moment.");
+      }
+    };
+
+    if (editingId){
+      var existing = txs.find(function(t){ return t.id === editingId; });
+      db.collection("transactions").doc(editingId).set({
+        date: date, person: person, type: ttype, amount: amount, note: note,
+        createdAt: existing && existing.createdAt ? existing.createdAt : now,
+        updatedAt: now
+      }).then(done, fail);
+    } else {
+      var ref = db.collection("transactions").doc();
+      var body = { date: date, person: person, type: ttype, amount: amount, note: note,
+                   createdAt: now, updatedAt: now };
+      // optimistic: sample mode should clear instantly on first real entry
+      pendingLocal[ref.id] = Object.assign({ id: ref.id }, body);
+      mergePending();
+      ref.set(body).then(done, function(e){
+        delete pendingLocal[ref.id];
+        mergePending();
+        fail(e);
+      });
+    }
+  });
+
+  function mergePending(){
+    Object.keys(pendingLocal).forEach(function(id){
+      if (!txs.some(function(t){ return t.id === id; })) txs.push(pendingLocal[id]);
+    });
+    renderAll();
+  }
+
+  /* ---------- row actions ---------- */
+  $("ledger-table").addEventListener("click", function(ev){
+    var btn = ev.target.closest("button[data-act]");
+    if (!btn) return;
+    var tr = btn.closest("tr");
+    var id = tr && tr.getAttribute("data-id");
+    var t = txs.find(function(x){ return x.id === id; });
+    if (!t) return;
+    if (btn.getAttribute("data-act") === "edit"){
+      openDialog(t);
+    } else {
+      if (btn.classList.contains("confirm")){
+        db.collection("transactions").doc(id).delete().catch(function(){ /* row re-renders from snapshot */ });
+        txs = txs.filter(function(x){ return x.id !== id; });
+        delete pendingLocal[id];
+        renderAll();
+      } else {
+        btn.classList.add("confirm");
+        btn.textContent = "confirm?";
+        setTimeout(function(){
+          btn.classList.remove("confirm");
+          btn.textContent = "delete";
+        }, 3500);
+      }
+    }
+  });
+
+  /* ---------- filters ---------- */
+  ["flt-person","flt-type","flt-year"].forEach(function(id){
+    $(id).addEventListener("change", renderLedger);
+  });
+
+  /* ---------- CSV export ---------- */
+  $("btn-export").addEventListener("click", function(){
+    if (!dl) return;
+    var head = "date,person,type,amount,signed_amount,note,recorded_at,updated_at\n";
+    var body = sortRows(rows()).map(function(t){
+      var ty = TYPES[t.type] || TYPES.deposit;
+      var q = function(s){ return '"' + String(s == null ? "" : s).replace(/"/g,'""') + '"'; };
+      return [t.date, t.person, t.type, t.amount, (Number(t.amount)||0)*ty.sign,
+              q(t.note||""), t.createdAt||"", t.updatedAt||""].join(",");
+    }).join("\n");
+    dl.save({ filename: "kenmore-house-ledger.csv", data: head + body + "\n" })
+      .catch(function(){ /* viewer declined — nothing to do */ });
+  });
+
+  /* ---------- boot ---------- */
+  renderAll(); // paint immediately (pending state)
+
+  var banner = $("db-banner");
+  function showBanner(msg){ banner.textContent = msg; banner.classList.add("show"); }
+  var use = function(name){
+    try {
+      if (window.claude && typeof window.claude.use === "function") return window.claude.use(name);
+    } catch(e){}
+    return Promise.resolve(null);
+  };
+
+  use("db").then(function(ns){
+    if (!ns){
+      dbState = "none";
+      showBanner("This view can't reach the shared ledger, so entries can't be read or saved here. Open the page from claude.ai while signed in.");
+      renderAll();
+      return;
+    }
+    db = ns;
+    dbState = "ok";
+    db.collection("transactions").onSnapshot(function(snap){
+      txs = snap.docs.filter(function(d){ return d.exists; }).map(function(d){
+        var b = d.data() || {};
+        return { id: d.id, date: String(b.date||""), person: String(b.person||""),
+                 type: String(b.type||"deposit"), amount: Number(b.amount)||0,
+                 note: b.note == null ? "" : String(b.note),
+                 createdAt: b.createdAt || "", updatedAt: b.updatedAt || "" };
+      });
+      Object.keys(pendingLocal).forEach(function(id){
+        if (txs.some(function(t){ return t.id === id; })) delete pendingLocal[id];
+      });
+      mergePending();
+    }, function(e){
+      if (e && e.code === "revoked"){
+        dbState = "none";
+        showBanner("Access to the shared ledger changed while the page was open. Reload to reconnect.");
+      } else {
+        showBanner("The shared ledger connection was interrupted (" + (e && e.code) + "). Reload the page to reconnect.");
+      }
+      renderAll();
+    });
+  });
+
+  use("downloads").then(function(ns){
+    if (ns){ dl = ns; $("btn-export").hidden = false; }
+  });
+
+  use("user").then(function(u){
+    if (!u) return;
+    var w = u.can("data.write");
+    Promise.resolve(w).then(function(ok){
+      if (ok === false){
+        writeLocked = true;
+        showBanner("You're viewing the ledger read-only. Ask David to share the page with edit access so your entries can save.");
+        renderAll();
+      }
+    });
+  });
+})();
+</script>
