@@ -2,9 +2,8 @@
 
 A shared ownership and loan tracker for 18112 60th Ave NE, Kenmore, WA 98028,
 built for David & Brian's joint home purchase financed with a CMG Financial
-All In One loan.
-
-**Live dashboard:** https://claude.ai/artifact/LF9PvQpZsRsAGnNaiSo3f1
+All In One loan. Fully self-hosted on GitHub: the page is static HTML, the
+data is a JSON file in this repo, and every entry is a git commit.
 
 ## What it tracks
 
@@ -32,18 +31,28 @@ Derived figures:
 
 ## How it's built
 
-A single self-contained page (`index.html`) published as a Claude artifact.
-Entries live in the artifact's shared database, so both partners see the same
-ledger; the page renders example data (clearly badged) until the first real
-entry is saved. There is no direct API integration with the loan account —
-CMG's All In One servicing portal has no public API — so the intended workflow
-is a once-a-month manual logging session.
+A single self-contained page (`index.html`) with no runtime dependencies
+beyond GitHub itself:
 
-## Data mirror
+- **Data:** `transactions.json` at the repo root is the database. The page
+  reads and writes it through the GitHub Contents API, so every add, edit,
+  or delete lands as its own commit — `git log transactions.json` is the
+  full audit history.
+- **Auth:** each partner creates a GitHub token scoped to this repository
+  (Contents read/write), pastes it into the page once, and it's kept in
+  that browser's local storage. Entries record which GitHub account logged
+  them.
+- **Concurrency:** writes are sha-guarded; on a mid-air collision the page
+  re-reads the file, re-applies the change, and retries.
+- **Hosting:** serve `index.html` from GitHub Pages, or simply open the
+  file locally — the GitHub API allows browser calls from anywhere.
 
-`transactions.json` is a mirror of the dashboard's shared database, synced to
-this repo by a weekly scheduled task (and on demand). Git history makes it a
-durable, auditable record of the ledger: every change to the data arrives as a
-commit. The dashboard remains the place entries are made — the published page
-runs in a sandbox that cannot call the GitHub API directly, so the mirror is
-one-way (database → repo).
+There is no direct API integration with the loan account — CMG's All In One
+servicing portal has no public API — so the intended workflow is a
+once-a-month manual logging session.
+
+Note: GitHub Pages sites are public even on private repos (the transaction
+data itself stays private — it's only readable with a token — but the page
+shell, including names and the address, would be visible to anyone with the
+Pages URL). Opening `index.html` from a local copy of the repo avoids that
+entirely.

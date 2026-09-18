@@ -1,6 +1,12 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kenmore House Ledger</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <style>
+  *, *::before, *::after{ box-sizing:border-box; }
   :root{
     --paper:#F4F1E8;
     --paper-deep:#EDE8DA;
@@ -16,6 +22,7 @@
     --david-tint:#F0E2DE;
     --brian:#2F5CAD;
     --brian-tint:#E0E5F0;
+    --moss:#55703F;
     --serif:"Noto Serif JP", "Hiragino Mincho ProN", Georgia, serif;
     --mono:"JetBrains Mono", "SFMono-Regular", Consolas, monospace;
   }
@@ -133,6 +140,30 @@
     margin:0 0 .35rem;
   }
 
+  /* ---------- setup card ---------- */
+  #setup-card{margin-bottom:1.25rem;}
+  #setup-card ol{
+    margin:.5rem 0 1rem;padding-left:1.2rem;font-size:.9rem;color:var(--ink-soft);
+  }
+  #setup-card ol li{margin-bottom:.35rem;}
+  #setup-card code{
+    font-family:var(--mono);font-size:.8em;background:var(--paper-deep);
+    padding:.05em .35em;border-radius:3px;
+  }
+  #setup-card a{color:var(--seal);}
+  .token-row{display:flex;gap:.6rem;flex-wrap:wrap;}
+  .token-row input{
+    flex:1;min-width:220px;
+    font-family:var(--mono);font-size:.875rem;color:var(--ink);
+    background:var(--paper-card);
+    border:1px solid var(--wash-light);border-radius:.4rem;
+    padding:.5rem .6rem;
+  }
+  .token-row input:focus{outline:2px solid var(--seal);outline-offset:2px;}
+  #setup-err{display:none;color:var(--seal);font-size:.8125rem;margin:.6rem 0 0;}
+  #setup-err.show{display:block;}
+  .setup-fine{font-size:.78rem;color:var(--wash);margin:.75rem 0 0;line-height:1.5;}
+
   /* ---------- ownership section ---------- */
   .own-grid{
     display:grid;grid-template-columns:7fr 5fr;gap:1.25rem;margin-bottom:1.25rem;
@@ -236,6 +267,11 @@
     padding:.7rem 1rem;margin:0 0 1.25rem;font-size:.875rem;
   }
   .banner.show{display:block;}
+  .banner.ok{border-left-color:var(--moss);font-family:var(--mono);font-size:.78rem;color:var(--ink-soft);}
+  .banner .link-btn{
+    background:none;border:none;padding:0;cursor:pointer;
+    font:inherit;color:var(--seal);text-decoration:underline;
+  }
 
   /* ---------- ledger ---------- */
   .filters{
@@ -290,7 +326,6 @@
   .icon-btn:hover{color:var(--ink);background:var(--paper-deep);}
   .icon-btn.confirm{color:var(--seal);border-color:var(--seal);}
   .icon-btn:focus-visible{outline:2px solid var(--seal);outline-offset:1px;}
-  .icon-btn svg{width:1em;height:1em;display:block;}
   .ledger-empty{padding:2.5rem 1rem;text-align:center;color:var(--wash);}
   .ledger-empty .btn{margin-top:.75rem;}
 
@@ -328,7 +363,7 @@
     position:absolute;left:.6rem;top:50%;transform:translateY(-50%);
     font-family:var(--mono);font-size:.875rem;color:var(--wash);
   }
-  .amount-wrap input{width:100%;box-sizing:border-box;padding-left:1.5rem;}
+  .amount-wrap input{width:100%;padding-left:1.5rem;}
 
   footer.colophon{
     margin-top:3rem;font-family:var(--mono);font-size:.71875rem;
@@ -342,6 +377,8 @@
     @keyframes rise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
   }
 </style>
+</head>
+<body>
 
 <div class="wrap">
   <header class="hero">
@@ -529,12 +566,41 @@
       <button class="tab" id="tab-ledger" role="tab" aria-selected="false" aria-controls="view-ledger">Ledger</button>
     </div>
     <div class="toolbar-actions">
-      <button class="btn btn-ghost" id="btn-export" hidden>Export CSV</button>
+      <button class="btn btn-ghost" id="btn-refresh" hidden>Refresh</button>
+      <button class="btn btn-ghost" id="btn-export">Export CSV</button>
       <button class="btn btn-primary" id="btn-add">Log an entry</button>
     </div>
   </div>
 
-  <div class="banner" id="db-banner"></div>
+  <div class="banner" id="status-banner"></div>
+
+  <div class="card" id="setup-card" hidden>
+    <p class="kicker">Connect</p>
+    <h2>Connect this browser to GitHub</h2>
+    <p style="margin:.25rem 0 0;font-size:.9rem;color:var(--ink-soft);">
+      The ledger's data lives in <code>transactions.json</code> in the
+      <code>davidmichio/Kenmore-House-Loan-Tracker</code> repository, and every entry you log
+      becomes a git commit. To read and write it, this page needs a GitHub token — created once,
+      pasted below, and kept only in this browser.
+    </p>
+    <ol>
+      <li>Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a> (a fine-grained token).</li>
+      <li>Repository access: <strong>Only select repositories</strong> → <code>Kenmore-House-Loan-Tracker</code>.</li>
+      <li>Permissions → Repository permissions → <strong>Contents: Read and write</strong>. Generate, then copy the token.</li>
+    </ol>
+    <div class="token-row">
+      <input type="password" id="gh-token" placeholder="github_pat_… or ghp_…" autocomplete="off" aria-label="GitHub token">
+      <button class="btn btn-primary" id="btn-connect">Connect</button>
+    </div>
+    <p id="setup-err"></p>
+    <p class="setup-fine">
+      Treat the token like a password: it grants exactly one thing — reading and writing the
+      contents of this one repository. If your account can't create a fine-grained token for this
+      repo (Brian: fine-grained tokens only cover repos you own), use a
+      <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener">classic token</a>
+      with the <code>repo</code> scope instead. Disconnect any time by clearing this site's data.
+    </p>
+  </div>
 
   <div class="example-note">
     <strong>Example data.</strong> These are sample figures so you can see how the ledger reads —
@@ -658,8 +724,7 @@
     <span id="foot-count">0 entries</span><span class="fsep">·</span>
     CMG Financial — All In One loan<span class="fsep">·</span>
     amounts in USD<span class="fsep">·</span>
-    shared ledger — entries save for both of you<span class="fsep">·</span>
-    mirrored weekly to GitHub
+    data lives in transactions.json — every entry is a git commit
   </footer>
 </div>
 
@@ -718,6 +783,8 @@
   "use strict";
 
   /* ---------- constants ---------- */
+  var GH = { owner:"davidmichio", repo:"Kenmore-House-Loan-Tracker", path:"transactions.json" };
+  var TOKEN_KEY = "khl-gh-token";
   var PEOPLE = { david:"David", brian:"Brian" };
   var TYPES = {
     deposit:     { label:"LOAN - deposit",    sign:+1, loan:+1 },
@@ -744,13 +811,10 @@
   ];
 
   /* ---------- state ---------- */
-  var db = null, dl = null;
-  var dbState = "pending";      // pending | ok | none
-  var txs = [];                 // real rows from the store
-  var usingSample = false;
+  var token = null, branch = null, fileSha = null, login = null;
+  var connected = false, connecting = false;
+  var txs = [];
   var editingId = null;
-  var writeLocked = false;      // set when a well-formed write is refused
-  var pendingLocal = {};        // optimistic adds before snapshot echo
 
   var $ = function(id){ return document.getElementById(id); };
   var fmt0 = new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0});
@@ -761,7 +825,6 @@
       return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
     });
   }
-  function rows(){ return usingSample ? SAMPLE : txs; }
   function sortRows(list){
     return list.slice().sort(function(a,b){
       if (a.date !== b.date) return a.date < b.date ? -1 : 1;
@@ -770,6 +833,184 @@
       return a.id < b.id ? -1 : 1;
     });
   }
+
+  /* ---------- GitHub API ---------- */
+  function gh(path, opts){
+    opts = opts || {};
+    opts.headers = Object.assign({
+      "Authorization": "Bearer " + token,
+      "Accept": "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28"
+    }, opts.headers || {});
+    opts.cache = "no-store";
+    return fetch("https://api.github.com" + path, opts);
+  }
+  function b64encode(str){
+    var bytes = new TextEncoder().encode(str);
+    var bin = "";
+    for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin);
+  }
+  function b64decode(str){
+    var bin = atob(String(str).replace(/\s/g,""));
+    var bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder().decode(bytes);
+  }
+  function normalize(t){
+    return {
+      id: String(t.id || genId()),
+      date: String(t.date || ""),
+      person: String(t.person || ""),
+      type: TYPES[t.type] ? t.type : "deposit",
+      amount: Number(t.amount) || 0,
+      note: t.note == null ? "" : String(t.note),
+      createdAt: t.createdAt || "",
+      updatedAt: t.updatedAt || "",
+      enteredBy: t.enteredBy == null ? "" : String(t.enteredBy)
+    };
+  }
+  function genId(){
+    var s = "", c = "abcdefghijklmnopqrstuvwxyz0123456789";
+    var a = new Uint8Array(16);
+    (window.crypto || {getRandomValues:function(x){for(var i=0;i<x.length;i++)x[i]=Math.floor(Math.random()*256);}}).getRandomValues(a);
+    for (var i = 0; i < 16; i++) s += c[a[i] % 36];
+    return s;
+  }
+
+  function loadFile(){
+    return gh("/repos/" + GH.owner + "/" + GH.repo + "/contents/" + GH.path + "?ref=" + encodeURIComponent(branch))
+      .then(function(res){
+        if (res.status === 404){ fileSha = null; txs = []; return; }
+        if (!res.ok) throw new Error("read failed (" + res.status + ")");
+        return res.json().then(function(j){
+          fileSha = j.sha;
+          var data = {};
+          try { data = JSON.parse(b64decode(j.content)); } catch(e){ throw new Error("transactions.json is not valid JSON — fix it in the repo"); }
+          txs = (data.transactions || []).map(normalize);
+        });
+      });
+  }
+
+  function saveFile(message){
+    var body = JSON.stringify({
+      updatedAt: new Date().toISOString(),
+      count: txs.length,
+      transactions: sortRows(txs)
+    }, null, 2) + "\n";
+    var payload = { message: message, content: b64encode(body), branch: branch };
+    if (fileSha) payload.sha = fileSha;
+    return gh("/repos/" + GH.owner + "/" + GH.repo + "/contents/" + GH.path, {
+      method: "PUT",
+      body: JSON.stringify(payload)
+    }).then(function(res){
+      if (res.status === 409 || res.status === 422){
+        var e = new Error("conflict"); e.conflict = true; throw e;
+      }
+      if (!res.ok) throw new Error("write failed (" + res.status + ")");
+      return res.json().then(function(j){ fileSha = j.content.sha; });
+    });
+  }
+
+  /* apply(txs) mutates the list; on a mid-air conflict the file is re-read
+     and the same change re-applied once before giving up. */
+  function commitChange(apply, message){
+    apply();
+    renderAll();
+    return saveFile(message).catch(function(e){
+      if (!e.conflict) throw e;
+      return loadFile().then(function(){
+        apply();
+        renderAll();
+        return saveFile(message);
+      });
+    });
+  }
+
+  /* ---------- connection ---------- */
+  var banner = $("status-banner");
+  function showBanner(msg, ok){
+    banner.innerHTML = msg;
+    banner.classList.add("show");
+    banner.classList.toggle("ok", !!ok);
+  }
+  function hideBanner(){ banner.classList.remove("show"); }
+
+  function setupError(msg){
+    var el = $("setup-err");
+    el.textContent = msg;
+    el.classList.add("show");
+  }
+
+  function connect(tok, silent){
+    connecting = true;
+    token = tok;
+    return gh("/user").then(function(r){
+      if (r.status === 401) throw new Error("GitHub didn't accept that token. Check it was copied whole and hasn't expired.");
+      return r.ok ? r.json() : null;
+    }).then(function(u){
+      login = u && u.login ? u.login : "";
+      return gh("/repos/" + GH.owner + "/" + GH.repo);
+    }).then(function(r){
+      if (!r.ok) throw new Error("The token can't see " + GH.owner + "/" + GH.repo + ". Make sure it has Contents read & write on that repository" + (r.status === 404 ? "" : " (" + r.status + ")") + ".");
+      return r.json();
+    }).then(function(repo){
+      branch = repo.default_branch;
+      return loadFile();
+    }).then(function(){
+      connected = true;
+      connecting = false;
+      try { localStorage.setItem(TOKEN_KEY, token); } catch(e){}
+      $("setup-card").hidden = true;
+      $("btn-refresh").hidden = false;
+      showBanner("connected — " + esc(GH.owner + "/" + GH.repo) + " @ " + esc(branch) +
+        (login ? " as " + esc(login) : "") +
+        " &nbsp;·&nbsp; <button class='link-btn' id='btn-disconnect'>disconnect</button>", true);
+      renderAll();
+    }).catch(function(e){
+      connecting = false;
+      connected = false;
+      token = null;
+      $("setup-card").hidden = false;
+      if (silent){
+        try { localStorage.removeItem(TOKEN_KEY); } catch(err){}
+        showBanner("The saved GitHub token stopped working — reconnect below.");
+      } else {
+        setupError(e.message || "Couldn't connect.");
+      }
+      renderAll();
+    });
+  }
+
+  banner.addEventListener("click", function(ev){
+    if (ev.target && ev.target.id === "btn-disconnect"){
+      try { localStorage.removeItem(TOKEN_KEY); } catch(e){}
+      token = null; connected = false; login = null; fileSha = null; txs = [];
+      hideBanner();
+      $("setup-card").hidden = false;
+      $("btn-refresh").hidden = true;
+      renderAll();
+    }
+  });
+
+  $("btn-connect").addEventListener("click", function(){
+    $("setup-err").classList.remove("show");
+    var tok = $("gh-token").value.trim();
+    if (!tok) return setupError("Paste a token first.");
+    $("btn-connect").disabled = true;
+    connect(tok, false).then(function(){ $("btn-connect").disabled = false; $("gh-token").value = ""; });
+  });
+  $("gh-token").addEventListener("keydown", function(ev){
+    if (ev.key === "Enter"){ ev.preventDefault(); $("btn-connect").click(); }
+  });
+
+  $("btn-refresh").addEventListener("click", function(){
+    if (!connected) return;
+    var b = $("btn-refresh");
+    b.disabled = true;
+    loadFile().then(function(){ renderAll(); }, function(){ showBanner("Couldn't refresh from GitHub — try again in a moment."); })
+      .then(function(){ b.disabled = false; });
+  });
 
   /* ---------- aggregation ---------- */
   function aggregate(list){
@@ -793,6 +1034,8 @@
   }
 
   /* ---------- dashboard render ---------- */
+  var usingSample = false;
+  function activeRows(){ return usingSample ? SAMPLE : txs; }
   function money(v, precise){
     var f = (precise ? fmt2 : fmt0).format(Math.abs(v));
     return v < 0 ? "−" + f : f;
@@ -802,7 +1045,7 @@
   }
 
   function renderDashboard(){
-    var list = rows();
+    var list = activeRows();
     var a = aggregate(list);
     var dPct = null, bPct = null;
     if (a.totalOwn > 0){
@@ -851,7 +1094,8 @@
       (a.david.impCount + a.brian.impCount) + "</td>" +
       moneyCell(a.david.imp + a.brian.imp) + "</tr>";
 
-    $("foot-count").textContent = (usingSample ? "0 entries (showing example)" :
+    $("foot-count").textContent = (usingSample ?
+      (connected ? "0 entries (showing example)" : "not connected (showing example)") :
       txs.length + (txs.length === 1 ? " entry" : " entries"));
 
     renderChart(sortRows(list));
@@ -873,14 +1117,12 @@
       return;
     }
 
-    // cumulative stake per person at each entry
     var pts = [], cd = 0, cb = 0;
     sorted.forEach(function(t){
       var amt = (Number(t.amount) || 0) * TYPES[t.type].sign;
       if (t.person === "david") cd += amt; else cb += amt;
       pts.push({ date:t.date, d:cd, b:cb });
     });
-    // collapse to one point per date (last of day)
     var byDate = [];
     pts.forEach(function(p){
       if (byDate.length && byDate[byDate.length-1].date === p.date) byDate[byDate.length-1] = p;
@@ -895,7 +1137,6 @@
     var maxY = 0, minY = 0;
     byDate.forEach(function(p){ maxY = Math.max(maxY, p.d, p.b); minY = Math.min(minY, p.d, p.b); });
     if (maxY <= 0) maxY = 1;
-    // nice ticks
     var span = maxY - Math.min(0, minY);
     var step = Math.pow(10, Math.floor(Math.log10(span)));
     if (span / step < 2) step /= 5; else if (span / step < 5) step /= 2;
@@ -919,7 +1160,6 @@
     };
 
     var g = "";
-    // gridlines + y labels
     for (var v = yMin; v <= yMax + step/2; v += step){
       var y = Y(v).toFixed(1);
       g += "<line x1='" + mL + "' x2='" + (W-mR) + "' y1='" + y + "' y2='" + y +
@@ -927,7 +1167,6 @@
       g += "<text x='" + (mL-8) + "' y='" + y + "' text-anchor='end' dominant-baseline='middle' " +
            "font-size='11' fill='#807A6E' font-family='JetBrains Mono, monospace'>" + sh(v) + "</text>";
     }
-    // x ticks: up to 6, month labels
     var months = {};
     byDate.forEach(function(p){ months[p.date.slice(0,7)] = true; });
     var mkeys = Object.keys(months).sort();
@@ -942,7 +1181,6 @@
       g += "<text x='" + x.toFixed(1) + "' y='" + (H-10) + "' text-anchor='middle' font-size='11' " +
            "fill='#807A6E' font-family='JetBrains Mono, monospace'>" + esc(lbl) + "</text>";
     });
-    // series
     var last = byDate[byDate.length-1];
     [["d","#9C2A1E","David"],["b","#2F5CAD","Brian"]].forEach(function(s){
       g += "<path d='" + stepPath(s[0]) + "' fill='none' stroke='" + s[1] + "' stroke-width='2' stroke-linejoin='round'/>";
@@ -951,7 +1189,6 @@
       g += "<text x='" + (ex+9).toFixed(1) + "' y='" + ey.toFixed(1) + "' dominant-baseline='middle' font-size='12' " +
            "font-weight='600' fill='#1A1916' font-family='Noto Serif JP, serif'>" + s[2] + "</text>";
     });
-    // hover crosshair placeholder
     g += "<line id='xhair' x1='0' x2='0' y1='" + mT + "' y2='" + (mT+ih) + "' stroke='#807A6E' stroke-width='1' stroke-dasharray='3 3' visibility='hidden'/>";
 
     var svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
@@ -1008,22 +1245,22 @@
     if (isNaN(d)) return "";
     var s = d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"2-digit"}) +
             " " + d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
+    if (t.enteredBy) s += " by " + t.enteredBy;
     if (t.updatedAt && t.updatedAt !== t.createdAt) s += " · edited";
     return s;
   }
 
   function renderLedger(){
     var fp = $("flt-person").value, ft = $("flt-type").value, fy = $("flt-year").value;
-    var list = sortRows(rows()).filter(function(t){
+    var list = sortRows(activeRows()).filter(function(t){
       if (fp && t.person !== fp) return false;
       if (ft && t.type !== ft) return false;
       if (fy && t.date.slice(0,4) !== fy) return false;
       return true;
     });
 
-    // year filter options
     var years = {};
-    rows().forEach(function(t){ years[t.date.slice(0,4)] = true; });
+    activeRows().forEach(function(t){ years[t.date.slice(0,4)] = true; });
     var ysel = $("flt-year");
     var have = Array.prototype.map.call(ysel.options, function(o){ return o.value; });
     Object.keys(years).sort().forEach(function(y){
@@ -1039,7 +1276,7 @@
     tb.innerHTML = list.map(function(t){
       var ty = TYPES[t.type] || TYPES.deposit;
       var signed = (Number(t.amount) || 0) * ty.sign;
-      var canAct = !usingSample && !writeLocked && dbState === "ok";
+      var canAct = !usingSample && connected;
       return "<tr data-id='" + esc(t.id) + "'>" +
         "<td class='mono'>" + esc(t.date) + "</td>" +
         "<td><span class='who-chip'><span class='dot " + esc(t.person) + "'></span>" + esc(PEOPLE[t.person] || t.person) + "</span></td>" +
@@ -1056,7 +1293,7 @@
   }
 
   function renderAll(){
-    usingSample = (dbState !== "pending") && txs.length === 0;
+    usingSample = !connected || txs.length === 0;
     document.body.classList.toggle("sample-mode", usingSample);
     renderDashboard();
     renderLedger();
@@ -1121,59 +1358,39 @@
     if (!(amount > 0)) return formError("Enter an amount greater than zero.");
     amount = Math.round(amount * 100) / 100;
 
-    if (dbState !== "ok"){
-      return formError("The shared ledger isn't reachable from this view, so this entry can't be saved.");
-    }
-    if (writeLocked){
-      return formError("This view is read-only — your access level here doesn't allow saving entries.");
+    if (!connected){
+      return formError("Connect to GitHub first — the setup card at the top of the page walks through it.");
     }
 
     var now = new Date().toISOString();
     var saveBtn = $("btn-save");
     saveBtn.disabled = true;
+    var detail = PEOPLE[person] + " " + TYPES[ttype].label + " " + fmt2.format(amount) + " (" + date + ")";
 
-    var done = function(){ saveBtn.disabled = false; dlg.close(); };
-    var fail = function(e){
-      saveBtn.disabled = false;
-      if (e && e.code === "invalid_argument"){
-        writeLocked = true;
-        formError("The ledger refused the write — this view appears to be read-only. Ask David to share the page with edit access.");
-        renderAll();
-      } else if (e && e.code === "quota_exceeded"){
-        formError("The ledger's document limit is full. Delete old entries to make room.");
-      } else {
-        formError("Couldn't save (" + (e && e.code ? e.code : "unknown") + "). Try once more in a moment.");
-      }
-    };
-
+    var promise;
     if (editingId){
-      var existing = txs.find(function(t){ return t.id === editingId; });
-      db.collection("transactions").doc(editingId).set({
-        date: date, person: person, type: ttype, amount: amount, note: note,
-        createdAt: existing && existing.createdAt ? existing.createdAt : now,
-        updatedAt: now
-      }).then(done, fail);
+      var id = editingId;
+      promise = commitChange(function(){
+        var t = txs.find(function(x){ return x.id === id; });
+        if (!t) return;
+        t.date = date; t.person = person; t.type = ttype;
+        t.amount = amount; t.note = note; t.updatedAt = now;
+      }, "Ledger: edit " + detail);
     } else {
-      var ref = db.collection("transactions").doc();
-      var body = { date: date, person: person, type: ttype, amount: amount, note: note,
-                   createdAt: now, updatedAt: now };
-      // optimistic: sample mode should clear instantly on first real entry
-      pendingLocal[ref.id] = Object.assign({ id: ref.id }, body);
-      mergePending();
-      ref.set(body).then(done, function(e){
-        delete pendingLocal[ref.id];
-        mergePending();
-        fail(e);
-      });
+      var tx = normalize({ id: genId(), date: date, person: person, type: ttype,
+        amount: amount, note: note, createdAt: now, updatedAt: now, enteredBy: login || "" });
+      promise = commitChange(function(){
+        if (!txs.some(function(x){ return x.id === tx.id; })) txs.push(tx);
+      }, "Ledger: add " + detail);
     }
-  });
-
-  function mergePending(){
-    Object.keys(pendingLocal).forEach(function(id){
-      if (!txs.some(function(t){ return t.id === id; })) txs.push(pendingLocal[id]);
+    promise.then(function(){
+      saveBtn.disabled = false;
+      dlg.close();
+    }, function(e){
+      saveBtn.disabled = false;
+      formError("Couldn't save to GitHub (" + (e && e.message ? e.message : "unknown") + "). The entry is shown locally — Refresh will discard it, or try saving again.");
     });
-    renderAll();
-  }
+  });
 
   /* ---------- row actions ---------- */
   $("ledger-table").addEventListener("click", function(ev){
@@ -1187,10 +1404,12 @@
       openDialog(t);
     } else {
       if (btn.classList.contains("confirm")){
-        db.collection("transactions").doc(id).delete().catch(function(){ /* row re-renders from snapshot */ });
-        txs = txs.filter(function(x){ return x.id !== id; });
-        delete pendingLocal[id];
-        renderAll();
+        var detail = PEOPLE[t.person] + " " + TYPES[t.type].label + " " + fmt2.format(t.amount) + " (" + t.date + ")";
+        commitChange(function(){
+          txs = txs.filter(function(x){ return x.id !== id; });
+        }, "Ledger: delete " + detail).catch(function(){
+          showBanner("Couldn't delete on GitHub — Refresh and try again.");
+        });
       } else {
         btn.classList.add("confirm");
         btn.textContent = "confirm?";
@@ -1209,76 +1428,33 @@
 
   /* ---------- CSV export ---------- */
   $("btn-export").addEventListener("click", function(){
-    if (!dl) return;
-    var head = "date,person,type,amount,signed_amount,note,recorded_at,updated_at\n";
-    var body = sortRows(rows()).map(function(t){
+    var head = "date,person,type,amount,signed_amount,note,entered_by,recorded_at,updated_at\n";
+    var body = sortRows(activeRows()).map(function(t){
       var ty = TYPES[t.type] || TYPES.deposit;
       var q = function(s){ return '"' + String(s == null ? "" : s).replace(/"/g,'""') + '"'; };
       return [t.date, t.person, t.type, t.amount, (Number(t.amount)||0)*ty.sign,
-              q(t.note||""), t.createdAt||"", t.updatedAt||""].join(",");
+              q(t.note||""), t.enteredBy||"", t.createdAt||"", t.updatedAt||""].join(",");
     }).join("\n");
-    dl.save({ filename: "kenmore-house-ledger.csv", data: head + body + "\n" })
-      .catch(function(){ /* viewer declined — nothing to do */ });
+    var blob = new Blob([head + body + "\n"], {type:"text/csv"});
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "kenmore-house-ledger.csv";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
   });
 
   /* ---------- boot ---------- */
-  renderAll(); // paint immediately (pending state)
-
-  var banner = $("db-banner");
-  function showBanner(msg){ banner.textContent = msg; banner.classList.add("show"); }
-  var use = function(name){
-    try {
-      if (window.claude && typeof window.claude.use === "function") return window.claude.use(name);
-    } catch(e){}
-    return Promise.resolve(null);
-  };
-
-  use("db").then(function(ns){
-    if (!ns){
-      dbState = "none";
-      showBanner("This view can't reach the shared ledger, so entries can't be read or saved here. Open the page from claude.ai while signed in.");
-      renderAll();
-      return;
-    }
-    db = ns;
-    dbState = "ok";
-    db.collection("transactions").onSnapshot(function(snap){
-      txs = snap.docs.filter(function(d){ return d.exists; }).map(function(d){
-        var b = d.data() || {};
-        return { id: d.id, date: String(b.date||""), person: String(b.person||""),
-                 type: String(b.type||"deposit"), amount: Number(b.amount)||0,
-                 note: b.note == null ? "" : String(b.note),
-                 createdAt: b.createdAt || "", updatedAt: b.updatedAt || "" };
-      });
-      Object.keys(pendingLocal).forEach(function(id){
-        if (txs.some(function(t){ return t.id === id; })) delete pendingLocal[id];
-      });
-      mergePending();
-    }, function(e){
-      if (e && e.code === "revoked"){
-        dbState = "none";
-        showBanner("Access to the shared ledger changed while the page was open. Reload to reconnect.");
-      } else {
-        showBanner("The shared ledger connection was interrupted (" + (e && e.code) + "). Reload the page to reconnect.");
-      }
-      renderAll();
-    });
-  });
-
-  use("downloads").then(function(ns){
-    if (ns){ dl = ns; $("btn-export").hidden = false; }
-  });
-
-  use("user").then(function(u){
-    if (!u) return;
-    var w = u.can("data.write");
-    Promise.resolve(w).then(function(ok){
-      if (ok === false){
-        writeLocked = true;
-        showBanner("You're viewing the ledger read-only. Ask David to share the page with edit access so your entries can save.");
-        renderAll();
-      }
-    });
-  });
+  var saved = null;
+  try { saved = localStorage.getItem(TOKEN_KEY); } catch(e){}
+  if (saved){
+    renderAll();
+    connect(saved, true);
+  } else {
+    $("setup-card").hidden = false;
+    renderAll();
+  }
 })();
 </script>
+</body>
+</html>
