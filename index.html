@@ -585,7 +585,7 @@
     </p>
     <ol>
       <li>Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a> (a fine-grained token).</li>
-      <li>Repository access: <strong>Only select repositories</strong> → <code>Kenmore-House-Loan-Tracker</code>.</li>
+      <li>Repository access: <strong>Only select repositories</strong> → <code>Kenmore-House-Loan-Tracker</code>. (Not &ldquo;Public repositories&rdquo; — that option is read-only, so saving would fail.)</li>
       <li>Permissions → Repository permissions → <strong>Contents: Read and write</strong>. Generate, then copy the token.</li>
     </ol>
     <div class="token-row">
@@ -907,23 +907,39 @@
       if (res.status === 409 || res.status === 422){
         var e = new Error("conflict"); e.conflict = true; throw e;
       }
-      if (!res.ok) throw new Error("write failed (" + res.status + ")");
+      if (res.status === 403 || res.status === 404){
+        throw new Error("GitHub refused the write — this browser's token can read the repository but not change it. " +
+          "Create a new token with Contents set to “Read and write” on Kenmore-House-Loan-Tracker " +
+          "(a fine-grained token's “Public repositories” option is read-only), then use “disconnect” " +
+          "at the top of the page and connect with the new token.");
+      }
+      if (!res.ok) throw new Error("GitHub returned an error (" + res.status + "). Try again in a moment.");
       return res.json().then(function(j){ fileSha = j.content.sha; });
     });
   }
 
-  /* apply(txs) mutates the list; on a mid-air conflict the file is re-read
-     and the same change re-applied once before giving up. */
+  /* apply() mutates txs; on a mid-air conflict the file is re-read and the
+     same change re-applied once. If the save still fails, txs reverts so a
+     retry can't commit the change twice. */
   function commitChange(apply, message){
+    var before = txs.map(function(t){ return Object.assign({}, t); });
+    var beforeSha = fileSha;
     apply();
     renderAll();
     return saveFile(message).catch(function(e){
       if (!e.conflict) throw e;
       return loadFile().then(function(){
+        before = txs.map(function(t){ return Object.assign({}, t); });
+        beforeSha = fileSha;
         apply();
         renderAll();
         return saveFile(message);
       });
+    }).catch(function(e){
+      txs = before;
+      fileSha = beforeSha;
+      renderAll();
+      throw e;
     });
   }
 
@@ -1388,7 +1404,7 @@
       dlg.close();
     }, function(e){
       saveBtn.disabled = false;
-      formError("Couldn't save to GitHub (" + (e && e.message ? e.message : "unknown") + "). The entry is shown locally — Refresh will discard it, or try saving again.");
+      formError("Not saved. " + (e && e.message ? e.message : "Something went wrong — try again in a moment."));
     });
   });
 
@@ -1407,8 +1423,9 @@
         var detail = PEOPLE[t.person] + " " + TYPES[t.type].label + " " + fmt2.format(t.amount) + " (" + t.date + ")";
         commitChange(function(){
           txs = txs.filter(function(x){ return x.id !== id; });
-        }, "Ledger: delete " + detail).catch(function(){
-          showBanner("Couldn't delete on GitHub — Refresh and try again.");
+        }, "Ledger: delete " + detail).catch(function(e){
+          showBanner("Not deleted. " + esc(e && e.message ? e.message : "Try again in a moment.") +
+            " &nbsp;·&nbsp; <button class='link-btn' id='btn-disconnect'>disconnect</button>");
         });
       } else {
         btn.classList.add("confirm");
